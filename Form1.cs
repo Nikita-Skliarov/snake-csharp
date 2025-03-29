@@ -23,6 +23,8 @@ namespace snake
 
             startButton.Enabled = false;
             checkBox1.Enabled = false;
+            numberFoodDoublesInput.Enabled = false;
+            maxFoodOnFieldInput.Enabled = false;
 
             gameTimer.Tick -= gameTimer_Tick;
             gameField.Paint -= gameField_Paint;
@@ -48,7 +50,7 @@ namespace snake
         {
             CheckFoodConsumption(snake1, Snake1Score);
             CheckFoodConsumption(snake2, Snake2Score);
-
+             
             if (totalScore % Settings.TimesWhenFoodDoubles == 0 && totalScore != 0 && foodsIsRecentlyConsumed)
             {
                 if (foods.Count * 2 >= Settings.MaxFoodOnField)
@@ -60,7 +62,7 @@ namespace snake
                     SpawnFoods(foods.Count * 2);
                 }
             }
-            
+
             foodsIsRecentlyConsumed = false; // reset that food was consumed for next ticks
 
             snake1.Move();
@@ -94,6 +96,8 @@ namespace snake
                 gameTimer.Enabled = false;
                 startButton.Enabled = true;
                 checkBox1.Enabled = true;
+                numberFoodDoublesInput.Enabled = true;
+                maxFoodOnFieldInput.Enabled = true;
                 MessageBox.Show($"Game Over! {playerName} lost.");
             }
         }
@@ -126,6 +130,7 @@ namespace snake
             Brush snake1Color = new SolidBrush(Color.Red);
             Brush snake2Color = new SolidBrush(Color.Blue);
             Brush foodColor = new SolidBrush(Color.Green);
+            Brush portalColor = new SolidBrush(Color.Yellow);
 
             foreach (Cell segment in snake1.body)
             {
@@ -140,6 +145,11 @@ namespace snake
             foreach (Cell food in foods)
             {
                 g.FillRectangle(foodColor, food.x, food.y, Settings.CellSize, Settings.CellSize);
+            }
+
+            foreach (Cell portal in Settings.Portals)
+            {
+                g.FillRectangle(portalColor, portal.x, portal.y, Settings.CellSize + 5, Settings.CellSize + 5);
             }
         }
 
@@ -179,6 +189,26 @@ namespace snake
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             Settings.NoEdges = checkBox1.Checked;
+        }
+
+        private void numberFoodDoublesInput_TextChanged(object sender, EventArgs e)
+        {
+            int number;
+            bool isNumeric = int.TryParse(numberFoodDoublesInput.Text, out number);
+            if (isNumeric)
+            {
+                Settings.TimesWhenFoodDoubles = number;
+            }
+        }
+
+        private void maxFoodOnFieldInput_TextChanged(object sender, EventArgs e)
+        {
+            int number;
+            bool isNumeric = int.TryParse(maxFoodOnFieldInput.Text, out number);
+            if (isNumeric)
+            {
+                Settings.MaxFoodOnField = number;
+            }
         }
     }
 }

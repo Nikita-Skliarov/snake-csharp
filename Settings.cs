@@ -32,5 +32,11 @@ namespace snake
         /// Maximum number of food items on the field
         /// </summary>
         public static int MaxFoodOnField = 10;
+
+        public static List<Cell> Portals = new List<Cell>()
+        {
+            new Cell(250, 400),
+            new Cell(750, 100),
+        };
     }
 }

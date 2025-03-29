@@ -45,6 +45,30 @@ namespace snake
                 if (newHead.y >= 500) newHead.y = 0;
             }
 
+            foreach (Cell portal in Settings.Portals)
+            {
+                if (isTouchingPortal(portal))
+                {
+                    Cell otherPortal = Settings.Portals.FirstOrDefault(p => p != portal);
+
+                    if (otherPortal != null)
+                    {
+                        newHead.x = otherPortal.x;
+                        newHead.y = otherPortal.y;
+
+                        switch (this.direction)
+                        {
+                            case 0: newHead.y -= Settings.CellsDistance * 2; break; // Up
+                            case 1: newHead.x += Settings.CellsDistance * 2; break; // Right
+                            case 2: newHead.y += Settings.CellsDistance * 2; break; // Down
+                            case 3: newHead.x -= Settings.CellsDistance * 2; break; // Left
+                        }
+                    }
+                    break;
+                }
+            }
+
+
             // Move body correctly
             for (int i = this.body.Count - 1; i > 0; i--)
             {
@@ -92,6 +116,13 @@ namespace snake
             int distanceX = Math.Abs(this.body[0].x - food.x);
             int distanceY = Math.Abs(this.body[0].y - food.y);
 
+            return distanceX < Settings.CellSize && distanceY < Settings.CellSize;
+        }
+
+       public bool isTouchingPortal(Cell portal)
+        {
+            int distanceX = Math.Abs((this.body[0].x - portal.x) + 5);
+            int distanceY = Math.Abs((this.body[0].y - portal.y) + 5);
             return distanceX < Settings.CellSize && distanceY < Settings.CellSize;
         }
 
