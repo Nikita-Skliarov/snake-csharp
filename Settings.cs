@@ -17,5 +17,10 @@ namespace snake
         /// Initial distance between cells. Also used as distance to move
         /// </summary>
         public static int CellsDistance = 10;
+
+        /// <summary>
+        /// Game rule = if true, the snake will die if it hits the wall
+        /// </summary>
+        public static bool NoEdges = false;
     }
 }

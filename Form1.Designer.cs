@@ -34,6 +34,7 @@
             gameField = new Panel();
             Snake1Score = new Label();
             Snake2Score = new Label();
+            checkBox1 = new CheckBox();
             SuspendLayout();
             // 
             // startButton
@@ -85,11 +86,23 @@
             Snake2Score.TabIndex = 4;
             Snake2Score.Text = "0";
             // 
+            // checkBox1
+            // 
+            checkBox1.AutoSize = true;
+            checkBox1.Location = new Point(339, 560);
+            checkBox1.Name = "checkBox1";
+            checkBox1.Size = new Size(76, 19);
+            checkBox1.TabIndex = 5;
+            checkBox1.Text = "No edges";
+            checkBox1.UseVisualStyleBackColor = true;
+            checkBox1.CheckedChanged += checkBox1_CheckedChanged;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1041, 648);
+            Controls.Add(checkBox1);
             Controls.Add(Snake2Score);
             Controls.Add(Snake1Score);
             Controls.Add(gameField);
@@ -106,5 +119,6 @@
         private Panel gameField;
         private Label Snake1Score;
         private Label Snake2Score;
+        private CheckBox checkBox1;
     }
 }

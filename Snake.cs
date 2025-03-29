@@ -36,10 +36,14 @@ namespace snake
                 case 3: newHead.x -= Settings.CellsDistance; break;
             }
 
-            if (newHead.x < 0) newHead.x = 1000 - Settings.CellsDistance;
-            if (newHead.x >= 1000) newHead.x = 0;
-            if (newHead.y < 0) newHead.y = 500 - Settings.CellsDistance;
-            if (newHead.y >= 500) newHead.y = 0;
+
+            if (Settings.NoEdges)
+            {
+                if (newHead.x < 0) newHead.x = 1000 - Settings.CellsDistance;
+                if (newHead.x >= 1000) newHead.x = 0;
+                if (newHead.y < 0) newHead.y = 500 - Settings.CellsDistance;
+                if (newHead.y >= 500) newHead.y = 0;
+            }
 
             // Move body correctly
             for (int i = this.body.Count - 1; i > 0; i--)
@@ -102,6 +106,26 @@ namespace snake
             for (int i = 1; i < this.body.Count; i++)
             {
                 if (this.body[0].x == this.body[i].x && this.body[0].y == this.body[i].y) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if the snake has collided with the wall
+        /// </summary>
+        /// <algo>
+        /// If head of the snake reaches the wall and Settings.NoEdges is false, return true. Game stops then in Form1.cs
+        /// </algo>
+        public bool isCollidingWall()
+        {
+            /*if (newHead.x < 0) newHead.x = 1000 - Settings.CellsDistance;
+            if (newHead.x >= 1000) newHead.x = 0;
+            if (newHead.y < 0) newHead.y = 500 - Settings.CellsDistance;
+            if (newHead.y >= 500) newHead.y = 0;*/
+            Cell snakeHead = this.body[0];
+            if ((snakeHead.x < 0 || snakeHead.x >= 1000 || snakeHead.y < 0 || snakeHead.y >= 500) && !Settings.NoEdges)
+            {
+                return true;
             }
             return false;
         }

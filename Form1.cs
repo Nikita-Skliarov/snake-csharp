@@ -1,3 +1,5 @@
+using System.ComponentModel.Design;
+
 namespace snake
 {
     public partial class Form1 : Form
@@ -18,6 +20,7 @@ namespace snake
             this.Focus();
 
             startButton.Enabled = false;
+            checkBox1.Enabled = false;
 
             gameTimer.Tick -= gameTimer_Tick;
             gameField.Paint -= gameField_Paint;
@@ -47,7 +50,7 @@ namespace snake
             }
             if (snake2.isEating(food))
             {
-                Snake1Score.Text = (int.Parse(Snake1Score.Text) + 1).ToString();
+                Snake2Score.Text = (int.Parse(Snake1Score.Text) + 1).ToString();
                 snake2.Grow();
                 food = new Cell(_random.Next(20, 980), _random.Next(20, 480));
             }
@@ -63,10 +66,12 @@ namespace snake
 
         private void CheckCollision(Snake snake, Snake otherSnake, string playerName)
         {
-            if (snake.isCollidingItself() || isCollidingWithOtherSnake(snake, otherSnake))
+            if (snake.isCollidingItself() || isCollidingWithOtherSnake(snake, otherSnake) || snake.isCollidingWall())
             {
                 gameTimer.Enabled = false;
+                
                 startButton.Enabled = true;
+                checkBox1.Enabled = true;
                 MessageBox.Show($"Game Over! {playerName} lost.");
             }
         }
@@ -133,6 +138,16 @@ namespace snake
                     break;
             }
             return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox1.Checked)
+            {
+                Settings.NoEdges = true;
+                return;
+            }
+            Settings.NoEdges = false;
         }
     }
 }
