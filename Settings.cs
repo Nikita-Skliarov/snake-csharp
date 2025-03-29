@@ -22,5 +22,15 @@ namespace snake
         /// Game rule = if true, the snake will die if it hits the wall
         /// </summary>
         public static bool NoEdges = false;
+
+        /// <summary>
+        /// Number of times food is eaten before we get more food in the field.
+        /// </summary>
+        public static int TimesWhenFoodDoubles = 2;
+
+        /// <summary>
+        /// Maximum number of food items on the field
+        /// </summary>
+        public static int MaxFoodOnField = 10;
     }
 }

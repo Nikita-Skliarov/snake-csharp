@@ -7,7 +7,9 @@ namespace snake
         private Random _random;
         public Snake snake1;
         public Snake snake2;
-        public Cell food;
+        public List<Cell> foods;
+        public int totalScore;
+        public bool foodsIsRecentlyConsumed = false;
 
         public Form1(Random random)
         {
@@ -28,12 +30,14 @@ namespace snake
             gameTimer.Tick += gameTimer_Tick;
             gameField.Paint += gameField_Paint;
 
-            snake1 = new Snake(0, 250, 250, Color.Red); // First snake
-            snake2 = new Snake(0, 750, 250, Color.Blue); // Second snake
+            snake1 = new Snake(0, 250, 250, Color.Red);
+            snake2 = new Snake(0, 750, 250, Color.Blue);
             Snake1Score.Text = "0";
             Snake2Score.Text = "0";
+            totalScore = 0;
 
-            food = new Cell(_random.Next(20, 980), _random.Next(20, 480));
+            foods = new List<Cell>();
+            SpawnFoods(1); // Start with 3 food items
 
             gameTimer.Interval = 50;
             gameTimer.Enabled = true;
@@ -42,18 +46,22 @@ namespace snake
 
         private void gameTimer_Tick(object? sender, EventArgs e)
         {
-            if (snake1.isEating(food))
+            CheckFoodConsumption(snake1, Snake1Score);
+            CheckFoodConsumption(snake2, Snake2Score);
+
+            if (totalScore % Settings.TimesWhenFoodDoubles == 0 && totalScore != 0 && foodsIsRecentlyConsumed)
             {
-                Snake1Score.Text = (int.Parse(Snake1Score.Text) + 1).ToString();
-                snake1.Grow();
-                food = new Cell(_random.Next(20, 980), _random.Next(20, 480));
+                if (foods.Count * 2 >= Settings.MaxFoodOnField)
+                {
+                    SpawnFoods(Settings.MaxFoodOnField);
+                }
+                else
+                {
+                    SpawnFoods(foods.Count * 2);
+                }
             }
-            if (snake2.isEating(food))
-            {
-                Snake2Score.Text = (int.Parse(Snake1Score.Text) + 1).ToString();
-                snake2.Grow();
-                food = new Cell(_random.Next(20, 980), _random.Next(20, 480));
-            }
+            
+            foodsIsRecentlyConsumed = false; // reset that food was consumed for next ticks
 
             snake1.Move();
             snake2.Move();
@@ -64,12 +72,26 @@ namespace snake
             gameField.Invalidate();
         }
 
+        private void CheckFoodConsumption(Snake snake, Label scoreLabel)
+        {
+            for (int i = 0; i < foods.Count; i++)
+            {
+                if (snake.isEating(foods[i]))
+                {
+                    scoreLabel.Text = (int.Parse(scoreLabel.Text) + 1).ToString();
+                    totalScore++;
+                    snake.Grow();
+                    foodsIsRecentlyConsumed = true;
+                    foods[i] = new Cell(_random.Next(20, 980), _random.Next(20, 480)); // Respawn food that was eaten
+                }
+            }
+        }
+
         private void CheckCollision(Snake snake, Snake otherSnake, string playerName)
         {
             if (snake.isCollidingItself() || isCollidingWithOtherSnake(snake, otherSnake) || snake.isCollidingWall())
             {
                 gameTimer.Enabled = false;
-                
                 startButton.Enabled = true;
                 checkBox1.Enabled = true;
                 MessageBox.Show($"Game Over! {playerName} lost.");
@@ -78,9 +100,9 @@ namespace snake
 
         private bool isCollidingWithOtherSnake(Snake snake, Snake otherSnake)
         {
-            for (int i = 0; i < otherSnake.body.Count; i++)
+            foreach (var segment in otherSnake.body)
             {
-                if (snake.body[0].x == otherSnake.body[i].x && snake.body[0].y == otherSnake.body[i].y)
+                if (snake.body[0].x == segment.x && snake.body[0].y == segment.y)
                 {
                     return true;
                 }
@@ -88,11 +110,22 @@ namespace snake
             return false;
         }
 
+        private void SpawnFoods(int count)
+        {
+            if (foods.Count >= Settings.MaxFoodOnField) return; // If we already have the maximum, do nothing
+            foods.Clear();
+            for (int i = 0; i < count; i++)
+            {
+                foods.Add(new Cell(_random.Next(20, 980), _random.Next(20, 480)));
+            }
+        }
+
         private void gameField_Paint(object? sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
             Brush snake1Color = new SolidBrush(Color.Red);
             Brush snake2Color = new SolidBrush(Color.Blue);
+            Brush foodColor = new SolidBrush(Color.Green);
 
             foreach (Cell segment in snake1.body)
             {
@@ -104,7 +137,10 @@ namespace snake
                 g.FillRectangle(snake2Color, segment.x, segment.y, Settings.CellSize, Settings.CellSize);
             }
 
-            g.FillRectangle(new SolidBrush(Color.Green), food.x, food.y, Settings.CellSize, Settings.CellSize);
+            foreach (Cell food in foods)
+            {
+                g.FillRectangle(foodColor, food.x, food.y, Settings.CellSize, Settings.CellSize);
+            }
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -142,12 +178,7 @@ namespace snake
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            if (checkBox1.Checked)
-            {
-                Settings.NoEdges = true;
-                return;
-            }
-            Settings.NoEdges = false;
+            Settings.NoEdges = checkBox1.Checked;
         }
     }
 }
